@@ -1,6 +1,6 @@
 # TradeMaster
 
-Spring Boot application for recording stock trades, retrieving trade history, and exposing operational metrics.
+Spring Boot application for recording stock trades, retrieving trade history, and tracking API usage with Micrometer metrics.
 
 ## Features
 
@@ -8,7 +8,7 @@ Spring Boot application for recording stock trades, retrieving trade history, an
 - Persist trade records with JPA and MySQL
 - Query trade history by username
 - Expose Actuator and Prometheus metrics
-- Support Grafana/Prometheus monitoring via the included templates
+- Track trade-history access count through a custom counter
 
 ## API
 

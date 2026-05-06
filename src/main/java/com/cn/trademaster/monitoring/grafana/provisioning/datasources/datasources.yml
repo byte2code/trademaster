@@ -1,4 +1,3 @@
-# Complete the configuration with reference to the code given in the problem statement
 apiVersion: 1
 datasources:
   - name: Prometheus

@@ -8,8 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+// Add these imports for Counter and MeterRegistry
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
 
+import java.util.List;
 
 @Service
 public class TradeService {
@@ -18,6 +21,14 @@ public class TradeService {
     private TradeRepo tradeRepo;
 
     Logger logger = LoggerFactory.getLogger(TradeService.class);
+
+    // 1. Create Counter variable initialized to null
+    private Counter getTradeHistoryCounter = null;
+
+    // 2. Modified constructor to accept CompositeMeterRegistry
+    public TradeService(CompositeMeterRegistry meterRegistry) {
+        getTradeHistoryCounter = meterRegistry.counter("get.trade.history.counter");
+    }
 
     public void executeTrade(TradeDto tradeDto) {
         Trade trade = new Trade();
@@ -36,7 +47,6 @@ public class TradeService {
         }
     }
 
-
     public List<Trade> getTradeHistory(String username) {
         List<Trade> tradesByUsername = tradeRepo.findByStockHolderUserName(username);
 
@@ -46,6 +56,10 @@ public class TradeService {
         else {
             logger.info("Fetching trade history for '{}'", username);
         }
+        
+        // 3. Increment counter when API is accessed
+        getTradeHistoryCounter.increment();
+        
         return tradesByUsername;
     }
 }
