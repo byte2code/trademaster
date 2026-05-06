@@ -7,7 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
+
 
 @Service
 public class TradeService {
@@ -15,47 +17,35 @@ public class TradeService {
     @Autowired
     private TradeRepo tradeRepo;
 
-    // 1. Create logger object
-    private static final Logger logger = LoggerFactory.getLogger(TradeService.class);
+    Logger logger = LoggerFactory.getLogger(TradeService.class);
 
     public void executeTrade(TradeDto tradeDto) {
-	    // Map TradeDto to Trade entity
-	    Trade trade = new Trade();
-	    trade.setStockId(tradeDto.getStockId());
-	    trade.setStockName(tradeDto.getStockName());
-	    trade.setStockHolderUserName(tradeDto.getStockHolderUserName());
-	    trade.setQuantity(tradeDto.getQuantity());
-	    trade.setPrice(tradeDto.getPrice());
-	    // Use buyTrade directly
-	    trade.setBuyTrade(tradeDto.isBuyTrade());
-
-	    if (trade.getQuantity() > 1500) {
-	        logger.error("Trade quantity {} exceeds allowed maximum of 1500 for user: {}. Trade not executed.",
-	                     trade.getQuantity(), trade.getStockHolderUserName());
-	        return;
-	    }
-
-	    logger.warn("Trade about to be executed. Please remember your unique username: {}", trade.getStockHolderUserName());
-
-	    tradeRepo.save(trade);
-
-	    logger.info("Trade executed successfully for user: {} and stock: {} with quantity: {}.",
-	                trade.getStockHolderUserName(), trade.getStockName(), trade.getQuantity());
-	}
+        Trade trade = new Trade();
+        trade.setStockHolderUserName(tradeDto.getStockHolderUserName());
+        trade.setBuyTrade(tradeDto.isBuyTrade());
+        trade.setStockId(tradeDto.getStockId());
+        trade.setQuantity(tradeDto.getQuantity());
+        trade.setPrice(tradeDto.getPrice());
+        trade.setStockName(tradeDto.getStockName());
+        if (tradeDto.getQuantity() > 1500) {
+            logger.error("Trade quantity exceeds the maximum allowed quantity : 1500");
+        } else {
+            logger.warn("Remember your unique username!!");
+            tradeRepo.save(trade);
+            logger.info("Success: Stock with id '{}' added in portfolio for '{}'", tradeDto.getStockId(), trade.getStockHolderUserName());
+        }
+    }
 
 
     public List<Trade> getTradeHistory(String username) {
-        // 1. Fetch trades by username
         List<Trade> tradesByUsername = tradeRepo.findByStockHolderUserName(username);
 
-        // 2. Error-level log if no trades found
-        if (tradesByUsername == null || tradesByUsername.isEmpty()) {
-            logger.error("No trades found for user: {}", username);
-        } else {
-            // 3. Info-level log if trades found
-            logger.info("Found {} trades for user: {}", tradesByUsername.size(), username);
+        if (tradesByUsername.isEmpty()){
+            logger.error("No trades found for the username : '{}'", username);
         }
-        // 4. Return the list
+        else {
+            logger.info("Fetching trade history for '{}'", username);
+        }
         return tradesByUsername;
     }
 }

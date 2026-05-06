@@ -15,11 +15,15 @@ public class TradeMasterController {
     @Autowired
     private TradeService tradeService;
 
+
+
     @PostMapping("/execute-trade")
     public void executeTrade(@RequestBody TradeDto tradeDto){
 
             tradeService.executeTrade(tradeDto);
+
         }
+
 
     @GetMapping("/tradeHistory/{username}")
     public List<Trade> getTradeHistoryForUser(@PathVariable String username){
